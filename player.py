@@ -17,15 +17,15 @@ class Player:
         self.y_target = None
 
         self.start_speed = 400
-        self.max_speed = 2000
-        self.acceleration = 800
+        self.max_speed = 1500
+        self.acceleration = 5000
         self.speed = self.start_speed
 
         self.score = 0
 
     @property
     def rect(self):
-        return (self.pos, (TILESIZE, TILESIZE))
+        return pygame.Rect(self.pos, (TILESIZE, TILESIZE))
 
     def get_input(self, keydowns, keyups):
         if not self.move_dir:
@@ -115,3 +115,7 @@ class Player:
 
     def draw(self, surface):
         pygame.draw.rect(surface, INDIANRED, (self.pos, (TILESIZE, TILESIZE)))
+
+    def __repr__(self):
+        x, y = self.pos
+        return f"Player<({x}, {y})>"

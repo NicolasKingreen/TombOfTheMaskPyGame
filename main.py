@@ -5,7 +5,7 @@ import os
 import sys
 
 from colors import *
-from level import Level
+from level import Level, Camera
 from player import Player
 from tile import TILESIZE
 from util import *
@@ -38,10 +38,13 @@ class Game:
 
         filenames = list(*zip(os.walk("img/maps/")))[0][2]
         self.levels = [Level.from_img("img/maps/" + image) for image in filenames]
+
         # self.current_level = Level.from_img("img/maps/test_level.bmp")
         self.level_n = 0
         self.current_level = self.levels[self.level_n]
         self.player = Player(self.current_level)
+        self.camera = Camera(self.current_level, self.player, self.game_surface)
+        self.camera.zoom_scale = 0.5
 
     def run(self):
         self.is_running = True
@@ -88,13 +91,17 @@ class Game:
             self.level_n = (self.level_n + 1) % len(self.levels)
             self.current_level = self.levels[self.level_n]
             self.player = Player(self.current_level)
+            self.camera = Camera(self.current_level, self.player, self.game_surface)
 
     def _draw_frame(self):
+        if self.camera.zoom_scale < 1:
+            self.camera.zoom_scale += 0.008
         self.main_surface.fill(GRAY32)
 
         self.game_surface.fill(GRAY32)
-        self.current_level.draw(self.game_surface)
-        self.player.draw(self.game_surface)
+        #self.current_level.draw(self.game_surface)
+        #self.player.draw(self.game_surface)
+        self.camera.custom_draw()
         self.main_surface.blit(self.game_surface, (0, GUI_PADDING))
 
         draw(f"Score: {self.player.score}", color=INDIANRED)
