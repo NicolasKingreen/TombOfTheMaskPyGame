@@ -87,6 +87,7 @@ class Game:
 
     def _update_states(self, frame_time_s):
         self.player.update(frame_time_s)
+        self.camera.update(frame_time_s)
         if self.player.level_finished:
             self.level_n = (self.level_n + 1) % len(self.levels)
             self.current_level = self.levels[self.level_n]
