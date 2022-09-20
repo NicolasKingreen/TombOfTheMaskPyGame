@@ -28,9 +28,11 @@ GUI_PADDING = 40
 class Game:
     def __init__(self):
         self.main_surface = pygame.display.set_mode((WINSIZETILES[0], WINSIZETILES[1] + GUI_PADDING))
+        #self.main_surface = pygame.display.set_mode((WINSIZE720[0], WINSIZE720[1] + GUI_PADDING))
         self.game_surface = pygame.Surface(WINSIZETILES)
+        #self.game_surface = pygame.display.set_mode((WINSIZE720[0], WINSIZE720[1] + GUI_PADDING))
         self.clock = pygame.time.Clock()
-        self.debug = False
+        self.debug = True
         self.is_running = False
 
         self.max_fps_records = 60
@@ -56,6 +58,7 @@ class Game:
             self.last_fps_records.append(int(self.clock.get_fps()))
             if len(self.last_fps_records) > self.max_fps_records:
                 self.last_fps_records.pop(0)
+
 
             keydowns = []
             keyups = []
@@ -95,7 +98,7 @@ class Game:
             self.camera = Camera(self.current_level, self.player, self.game_surface)
 
     def _draw_frame(self):
-        if self.camera.zoom_scale < 1:
+        if self.camera.zoom_scale < 2:
             self.camera.zoom_scale += 0.008
         self.main_surface.fill(GRAY32)
 
