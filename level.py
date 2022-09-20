@@ -85,21 +85,25 @@ class Camera:
 
     def __init__(self, level, player, game_surface):
         self.game_surface = game_surface
-        self.offset = pygame.math.Vector2()
         self.level = level
         self.player = player
 
         self.all_objects = [self.player]
         self.all_objects.append(self.level.tiles)
 
+        self.offset = pygame.math.Vector2()
+
         self.zoom_scale = 1
+
         self.internal_surf_size = (2000, 2000)
         self.internal_surf = pygame.Surface(self.internal_surf_size, pygame.SRCALPHA)
         self.internal_rect = self.internal_surf.get_rect(center=(self.game_surface.get_width() // 2, self.game_surface.get_width() // 2))
         self.internal_surf_vector = pygame.math.Vector2(self.internal_surf_size)
         self.internal_offset = pygame.math.Vector2()
 
-        self.speed = 1000
+        self.speed = 800
+        self.acceleration = pygame.math.Vector2()
+        self.move_dir = pygame.math.Vector2()
 
         self.center_target_camera(self.player)
 
@@ -109,21 +113,27 @@ class Camera:
         self.offset.y = target.rect.centery - self.internal_surf.get_height() // 2
 
     def motion(self, frame_time_s):
-        if self.player.rect.centerx > self.internal_surf.get_width() // 2 + self.offset.x:
-            self.offset.x += self.speed * frame_time_s
-        if self.player.rect.centerx < self.internal_surf.get_width() // 2 + self.offset.x:
-            self.offset.x -= self.speed * frame_time_s
+        target_center = pygame.math.Vector2(self.player.rect.centerx - self.internal_surf.get_width() // 2,
+                                            self.player.rect.centery - self.internal_surf.get_height() // 2)
 
-        if self.player.rect.centery > self.internal_surf.get_height() // 2 + self.offset.y:
-            self.offset.y += self.speed * frame_time_s
-        if self.player.rect.centery < self.internal_surf.get_height() // 2 + self.offset.y:
-            self.offset.y -= self.speed * frame_time_s
+        vector = pygame.math.Vector2(target_center.x, target_center.y) - pygame.math.Vector2(self.offset.x, self.offset.y)
+        self.acceleration = target_center.distance_to(self.offset)
+        print(self.acceleration)
 
-        print(f"PLAYER: {self.player.rect.centerx}\tINTERNAL_SURF: {self.internal_surf.get_width() // 2 + self.offset.x}")
+        if vector.length() != 0:
+            vector = vector.normalize()
+        else:
+            vector = pygame.math.Vector2()
+
+        if not abs(target_center.x - self.offset.x) < 10 or not abs(target_center.y - self.offset.y) < 10:
+
+            self.offset.x += vector.x * self.speed * frame_time_s * self.acceleration * 0.009
+            self.offset.y += vector.y * self.speed * frame_time_s * self.acceleration * 0.009
+
+        #print(vector)
 
     def custom_draw(self):
         self.internal_surf.fill(GRAY32)
-        #self.center_target_camera(self.player)
 
         for obj in self.level.tiles + [self.player]:
             offset_pos = (obj.rect.topleft - self.offset + self.internal_offset)
