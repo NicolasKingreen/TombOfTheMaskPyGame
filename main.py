@@ -5,7 +5,8 @@ import os
 import sys
 
 from colors import *
-from level import Level, Camera
+from level import Level
+from camera import Camera
 from player import Player
 from tile import TILESIZE
 from util import *
@@ -27,6 +28,7 @@ GUI_PADDING = 40
 
 class Game:
     def __init__(self):
+        pygame.display.set_caption("Tomb of the Mask [PyGame]")
         self.main_surface = pygame.display.set_mode((WINSIZETILES[0], WINSIZETILES[1] + GUI_PADDING))
         #self.main_surface = pygame.display.set_mode((WINSIZE720[0], WINSIZE720[1] + GUI_PADDING))
         self.game_surface = pygame.Surface(WINSIZETILES)
@@ -58,7 +60,6 @@ class Game:
             self.last_fps_records.append(int(self.clock.get_fps()))
             if len(self.last_fps_records) > self.max_fps_records:
                 self.last_fps_records.pop(0)
-
 
             keydowns = []
             keyups = []
@@ -94,12 +95,12 @@ class Game:
         if self.player.level_finished:
             self.level_n = (self.level_n + 1) % len(self.levels)
             self.current_level = self.levels[self.level_n]
-            self.player = Player(self.current_level)
+            self.player = Player(self.current_level)  # encapsulate player creation by level
             self.camera = Camera(self.current_level, self.player, self.game_surface)
 
+
     def _draw_frame(self):
-        if self.camera.zoom_scale < 2:
-            self.camera.zoom_scale += 0.008
+
         self.main_surface.fill(GRAY32)
 
         self.game_surface.fill(GRAY32)
@@ -113,7 +114,7 @@ class Game:
 
         if self.debug:
             avg_fps = sum(self.last_fps_records) / len(self.last_fps_records)
-            draw(f"{avg_fps:.1f}", y=4)
+            draw(f"{avg_fps:.1f} avg fps", y=4)
         pygame.display.update()
 
 
