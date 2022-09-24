@@ -37,10 +37,11 @@ class Camera:
         self.target_center = Vector2(self.player.rect.center) - Vector2(self.internal_surf.get_rect().center)
 
         camera_to_target = self.target_center - self.offset
+        camera_to_target_distance = camera_to_target.magnitude()
         camera_to_target and camera_to_target.normalize_ip()
 
         self.acceleration = self.target_center.distance_to(self.offset) * 0.009
-        if camera_to_target.magnitude() < 4:
+        if camera_to_target_distance > 4:
             self.offset += camera_to_target * self.speed * frame_time_s * self.acceleration
 
     def custom_draw(self):
